@@ -47,7 +47,7 @@ exports.Signup = async (req, res) => {
     await tempOtp.save()
     console.log(email);
     
-    await sendMail(email, otp);
+    await sendMail(email, "signup" , otp , tempUser.username);
 
     res.status(201).json({ success: true, message: "OTP sent to email. Please verify." });
   } catch (err) {
@@ -101,7 +101,11 @@ exports.VerifyOtp = async (req, res) => {
         { expiresIn: '2h' }
       );
 
+
+      await sendMail(email,"verifyadminotp","Welcome Back","")
+
       await OtpModel.deleteOne({ email });
+
 
       return res.status(200).json({
         success: true,
@@ -118,7 +122,7 @@ exports.VerifyOtp = async (req, res) => {
   }
 };
 
-exports.userLogin = async (req, res) => {
+exports.UserLogin = async (req, res) => {
     try {
       const { email, password } = req.body;
 
@@ -133,6 +137,8 @@ exports.userLogin = async (req, res) => {
       if (!isMatch)
         return res.status(401).json({ success: false, message: "Invalid credentials" });
 
+      sendMail(email , "login" , null , user.username)
+
       const token = jwt.sign(
         { userId: user._id },
         process.env.JWT_SECRET,
@@ -146,7 +152,7 @@ exports.userLogin = async (req, res) => {
     }
 };
 
-exports.adminLogin = async (req, res) => {
+exports.AdminLogin = async (req, res) => {
     try {
       const { email, password, phone } = req.body;
   
@@ -171,7 +177,7 @@ exports.adminLogin = async (req, res) => {
       await OtpModel.deleteMany({ email }); // Remove old OTPs
       await OtpModel.create({ email, otp, expires });
 
-      await sendMail(email, otp); // ✅ Add this line to actually send OTP
+      await sendMail(email, "login" , otp , null); // ✅ Add this line to actually send OTP
 
       return res.status(200).json({
         success: true,
@@ -184,4 +190,33 @@ exports.adminLogin = async (req, res) => {
       res.status(500).json({ success: false, message: "Login failed" });
     }
 };
+
+exports.ForgotPassword = async (req,res) => {
+  try {
+      const email = req.body
+
+      const findUser = await UserModel.findOne({email})
+      const findAdmin = await AdminModel.findOne({email})
+
+      if (!findUser || !findAdmin) {
+        return res.status(404).json({
+          success: false,
+          message: !findUser ? "User not found" : "Admin not found",
+        });
+      }
+
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const expires = new Date(Date.now() + 5 * 60 * 1000);
   
+      await OtpModel.deleteMany({ email }); // Remove old OTPs
+      await OtpModel.create({ email, otp, expires });
+      await sendMail(email , "reset", otp , findUser.username || ""); 
+
+    
+  } catch (err) {
+    console.error("Reset Password Error:", err);
+    res.status(500).json({ success: false, message: "Reset Password Failed" });
+  }
+}
+
+
