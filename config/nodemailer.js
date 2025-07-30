@@ -8,8 +8,6 @@ const transporter = nodemailer.createTransport({
     pass: process.env.MAIL_PASS,
   }
 });
-
-
 const sendOtpEmail = async (to,type,otp,username) => {
 
   if (type === 'signup') {
@@ -84,30 +82,42 @@ const sendOtpEmail = async (to,type,otp,username) => {
   } else if (type === 'verifyadminotp') {
     subject = `✅ Admin Login Successful - RasDhara App`;
     html = `
-    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.15); border: 1px solid #e0e0e0;">
-      <div style="background: linear-gradient(90deg, #43cea2, #185a9d); padding: 25px; color: white; text-align: center;">
-        <h1 style="margin: 0; font-size: 28px;"> RasDhara Admin</h1>
-        <p style="margin: 5px 0 0; font-size: 16px;">Login Successfull</p>
+    <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 600px; margin: auto; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.2); border: 1px solid #e0e0e0;">
+      <div style="background: linear-gradient(135deg, #43cea2, #185a9d); padding: 30px; color: white; text-align: center;">
+        <h1 style="margin: 0; font-size: 30px;">🌟RasDhara Admin🌟</h1>
+        <p style="margin: 8px 0 0; font-size: 17px;">Login Successful</p>
       </div>
   
-      <div style="padding: 30px; background-color: #ffffff;">
-        <h2 style="color: #333333;">Hello Admin 👋,</h2>
-        <p style="font-size: 16px; color: #555;">You have successfully logged into your RasDhara account .</p>
+      <div style="padding: 35px 30px; background-color: #ffffff;">
+        <h2 style="color: #333333;">Hello Admin 👋</h2>
+        <p style="font-size: 16px; color: #555;">You have successfully logged into your RasDhara account.</p>
   
         <div style="margin: 30px 0; text-align: center;">
-          <div style="display: inline-block; background: #f0fdf4; padding: 15px 30px; border-radius: 10px; font-size: 32px; font-weight: bold; color: #2e7d32; letter-spacing: 3px; border: 2px dashed #a5d6a7;">
+          <div style="
+            display: inline-block;
+            background: linear-gradient(90deg, #d4fc79, #96e6a1);
+            padding: 20px 40px;
+            border-radius: 14px;
+            font-size: 38px;
+            font-weight: bold;
+            color: #1b5e20;
+            letter-spacing: 5px;
+            border: 3px dashed #66bb6a;
+            box-shadow: 0 0 12px #a5d6a7, 0 0 24px #81c784;
+          ">
             ${otp}
           </div>
         </div>
-
-          <p style="font-size: 14px; color: #777;">If you didn’t initiate this login, we recommend updating your password and contacting support immediately.</p>
+  
+        <p style="font-size: 14px; color: #888; margin-top: 20px;">If this wasn’t you, please reset your password and contact support immediately.</p>
       </div>
   
       <div style="background: #f1f1f1; padding: 15px; text-align: center; color: #888; font-size: 13px;">
         &copy; ${new Date().getFullYear()} RasDhara App — All Rights Reserved.
       </div>
     </div>
-  `;  
+  `;
+  
   }else if (type === 'reset') {
     subject = `🔐 Password Reset OTP - RasDhara App`;
     html = `
