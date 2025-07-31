@@ -84,9 +84,3 @@ exports.UserLogin = async (req, res) => {
       res.status(500).json({ success: false, message: "Login failed" });
     }
 };
-
-
-
-
-
-

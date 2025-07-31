@@ -89,6 +89,10 @@ exports.ForgetPassword = async (req, res) => {
     const findUser = await UserModel.findOne({ email });
     const findAdmin = await AdminModel.findOne({ email });
 
+    console.log(findAdmin);
+    console.log(findUser);
+    
+
     if (!findUser && !findAdmin) {
       return res.status(404).json({
         success: false,
@@ -102,7 +106,9 @@ exports.ForgetPassword = async (req, res) => {
     await OtpModel.deleteMany({ email });
     await OtpModel.create({ email, otp, expires });
 
-    await sendMail(email, "reset", otp, findUser?.username || findAdmin?.username || "");
+    const usernameOrEmail = findUser?.username ||  findAdmin?.email || "";
+
+    await sendMail(email, "reset", otp, usernameOrEmail);
 
     return res.status(200).json({
       success: true,
@@ -110,38 +116,49 @@ exports.ForgetPassword = async (req, res) => {
     });
 
   } catch (err) {
-    console.error("Reset Password Error:", err);
-    res.status(500).json({ success: false, message: "Reset Password Failed" });
+    console.error("Forget Password Error:", err);
+    res.status(500).json({ success: false, message: "Forget Password Failed" });
   }
 };
 
-// ✅ 3. RESET PASSWORD AFTER OTP VERIFIED
+// ✅ 3. RESET PASSWORD 
 exports.ResetPassword = async (req, res) => {
   try {
-    const { email, newpassword } = req.body;
+    const authHeader = req.headers.authorization;
+    console.log("auth :",authHeader);
+    
 
-    const user = await UserModel.findOne({ email });
-    const admin = await AdminModel.findOne({ email });
-
-    if (!user && !admin) {
-      return res.status(404).json({ success: false, message: "User/Admin not found" });
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({ success: false, message: "Authorization header missing or invalid" });
     }
 
-    const hashedPassword = await bcrypt.hash(newpassword, 10);
-
-    if (user) {
-      user.password = hashedPassword;
-      await user.save();
+    const token = authHeader.split(" ")[1];
+    console.log("token:",token);
+    
+    if (!token) {
+      return res.status(401).json({ success: false, message: "Token missing" });
     }
 
-    if (admin) {
-      admin.password = hashedPassword;
-      await admin.save();
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+
+    const { newPassword } = req.body;
+    if (!newPassword) {
+      return res.status(400).json({ success: false, message: "New password is required" });
     }
 
-    return res.status(200).json({ success: true, message: "Password reset successfully" });
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    await UserModel.findByIdAndUpdate(userId, { password: hashedPassword });
+
+    return res.status(200).json({
+      success: true,
+      message: "Password reset successfully",
+    });
+
   } catch (err) {
-    console.error("ResetPassword Error:", err);
-    res.status(500).json({ success: false, message: "Failed to reset password" });
+    console.error("Reset Password Error:", err.message);
+    return res.status(500).json({ success: false, message: "Reset Password Failed" });
   }
 };
+

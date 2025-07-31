@@ -6,6 +6,14 @@ const tempSchema = new mongoose.Schema({
   email: { type: String, required:true, unique: true },
   password: {type:String , required:true},
   role: { type: String, enum: ['User'], default: 'User' }, 
+  createdAt: {
+    type: Date,
+    default: Date.now,
+    expires: 10  // ⏰ 10 minutes = 600 seconds
+  },
+},{
+  timestamps: true,
+  autoIndex: true, // ensure mongoose creates indexes
 });
 
 module.exports = mongoose.model('TemporaryUser', tempSchema);
