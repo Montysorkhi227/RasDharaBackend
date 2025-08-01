@@ -1,14 +1,15 @@
 const express = require("express");
 const router = express.Router();
-const productController = require("../controllers/productController");
-const verifyAdmin = require("../middleware/VerifyAdmin");
+
+const authAdminMiddleware = require("../middleware/authAdminMiddleware");
+const { CreateProduct } = require("../controllers/productController");
 
 // Admin-only routes
-router.post("/create", verifyAdmin, productController.createProduct);
-router.put("/edit/:id", verifyAdmin, productController.editProduct);
-router.delete("/delete/:id", verifyAdmin, productController.deleteProduct);
+router.post("/create", authAdminMiddleware, CreateProduct);
+// router.put("/edit/:id", verifyAdmin,);
+// router.delete("/delete/:id", verifyAdmin, );
 
-// Public (optional)
-router.get("/all", productController.getAllProducts);
+// // Public (optional)
+// router.get("/all", productController.getAllProducts);
 
 module.exports = router;

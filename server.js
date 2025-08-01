@@ -2,10 +2,10 @@ const express = require('express');
 const app = express();
 const DB = require("./config/db")
 const cors = require('cors');
-const userRoutes = require("./routes/userRoutes")
-const adminRoutes = require("./routes/adminRoutes")
-const authRoutes = require("./routes/authRoutes")
-const productRoutes = require("./routes/productRoutes")
+const userRoutes = require("./routes/userroutes")
+const adminRoutes = require("./routes/adminroutes")
+const authRoutes = require("./routes/authroutes")
+const productRoutes = require("./routes/productroutes")
 DB()
 
 app.use(cors({

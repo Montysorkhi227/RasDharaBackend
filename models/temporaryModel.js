@@ -9,7 +9,7 @@ const tempSchema = new mongoose.Schema({
   createdAt: {
     type: Date,
     default: Date.now,
-    expires: 10  // ⏰ 10 minutes = 600 seconds
+    expires: 600  // ⏰ 10 minutes = 600 seconds
   },
 },{
   timestamps: true,
