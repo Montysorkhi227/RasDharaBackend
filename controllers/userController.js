@@ -1,5 +1,5 @@
-const UserModel = require("../models/usermodel")
-const TempModel = require("../models/temporarymodel")
+const UserModel = require("../models/userModel")
+const TempModel = require("../models/temporaryModel")
 const OtpModel = require("../models/otpModel")
 const bcrypt = require("bcrypt")
 const sendMail = require("../config/nodemailer")
