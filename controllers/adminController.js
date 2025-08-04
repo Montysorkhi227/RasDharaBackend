@@ -5,7 +5,6 @@ const jwt = require("jsonwebtoken")
 const otpModel = require("../models/otpModel")
 require("dotenv").config()
 
-
 exports.AdminLogin = async (req, res) => {
     try {
       const { email, password, phone } = req.body;
@@ -28,10 +27,10 @@ exports.AdminLogin = async (req, res) => {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
       const expires = new Date(Date.now() + 5 * 60 * 1000);
   
-      await otpModel.deleteMany({ email }); // Remove old OTPs
+      await otpModel.deleteMany({ email });
       await otpModel.create({ email, otp, expires });
 
-      await sendMail(email, "login" , otp , null); // ✅ Add this line to actually send OTP
+      await sendMail(email, "login" , otp , null);
 
       return res.status(200).json({
         success: true,

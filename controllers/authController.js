@@ -172,20 +172,15 @@ exports.ChangePassword = async (req, res) => {
     if (!email) {
       return res.status(400).json({ success: false, message: "Email is required" });
     }
-
-    // ✅ Check if user is authenticated
     const tokenEmail = req.user?.email || req.admin?.email;
 
     if (!tokenEmail) {
       return res.status(401).json({ success: false, message: "Unauthorized: Please login first" });
     }
-
-    // ✅ Ensure provided email matches token email
     if (email !== tokenEmail) {
       return res.status(403).json({ success: false, message: "Email does not match your account" });
     }
 
-    // ✅ Check email exists in User or Admin model
     const user = await UserModel.findOne({ email });
     const admin = await AdminModel.findOne({ email });
 
@@ -195,12 +190,11 @@ exports.ChangePassword = async (req, res) => {
 
     // ✅ Generate OTP
     const otp = Math.floor(100000 + Math.random() * 900000);
-    const expires = Date.now() + 10 * 60 * 1000; // valid for 10 minutes
+    const expires = Date.now() + 10 * 60 * 1000; //10 minutes
 
      await OtpModel.deleteMany({ email });
     await OtpModel.create({ email, otp, expires });
 
-    // ✅ Send OTP via mail
     const usernameOrEmail = user?.username || admin?.email || "";
     await sendMail(email, "reset", otp, usernameOrEmail);
 
